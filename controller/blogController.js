@@ -37,13 +37,16 @@ export const getAllBlogs = async (req, res) => {
 // Get blogs by a specific user (author)
 export const getUserBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find({ author: req.params.userId }).populate(
+    const userId = req.params.user;
+    const blogs = await Blog.find({ author: userId }).populate(
       "author",
       "name email"
-    ); // Populating author field
-    res.json(blogs);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    );
+    res.status(200).json(blogs);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch user's blogs", error: error.message });
   }
 };
 
@@ -66,5 +69,23 @@ export const deleteBlog = async (req, res) => {
     res.json({ message: "Deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+export const getBlogById = async (req, res) => {
+  try {
+    const blogId = req.params.id;
+    const blog = await Blog.findById(blogId).populate("author", "name email");
+
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    res.status(200).json(blog);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch blog",
+      error: error.message,
+    });
   }
 };
