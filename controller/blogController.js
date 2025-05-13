@@ -50,15 +50,35 @@ export const getUserBlogs = async (req, res) => {
   }
 };
 
-// Update a blog
 export const updateBlog = async (req, res) => {
   try {
-    const updated = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+    console.log("hello");
+    const blogId = req.params.id;
+    const { title, content } = req.body;
+
+    let updatedData = { title, content };
+
+    // Check if image file is provided
+    if (req.file) {
+      const filePath = req.file.path;
+      const imageUrl = await uploadImageToSupabase(
+        filePath,
+        req.file.originalname
+      );
+
+      fs.unlinkSync(filePath); // optional cleanup
+      updatedData.image = imageUrl;
+    }
+
+    const updated = await Blog.findByIdAndUpdate(blogId, updatedData, {
       new: true,
     });
+
     res.json(updated);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to update blog", details: err.message });
   }
 };
 

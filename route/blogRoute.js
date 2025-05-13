@@ -16,7 +16,7 @@ router.post("/create", upload.single("image"), createBlog);
 router.get("/single/:id", getBlogById);
 router.get("/", getAllBlogs);
 router.get("/:user", getUserBlogs);
-router.put("/:id", updateBlog);
+router.patch("/:id", upload.single("image"), updateBlog);
 router.delete("/:id", deleteBlog);
 
 export default router;
